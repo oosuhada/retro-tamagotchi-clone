@@ -5,14 +5,6 @@ var height = 800;
 var width = 800;
 var buttonDispX = 50;
 
-// Keep the original 800x800 virtual device coordinates while scaling the
-// rendered canvas to whatever browser viewport is available.
-game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-game.scale.pageAlignHorizontally = true;
-game.scale.pageAlignVertically = true;
-game.scale.refresh();
-
-
 date = new Date();
 
 
@@ -171,6 +163,11 @@ var preload = {
 		
 	},
 	create: function(){
+		// Phaser의 scale manager는 boot가 끝난 뒤에만 준비되므로 state create에서 설정한다.
+		game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		game.scale.pageAlignHorizontally = true;
+		game.scale.pageAlignVertically = true;
+		game.scale.refresh();
 		loadStorage();
         //resetStorage();
 		game.state.start("main");

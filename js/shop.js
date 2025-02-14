@@ -1,3 +1,38 @@
+function foodItem(name,spriteIndex,cost,desc,hungRestore){
+	this.mainText = name;
+	this.spriteIndex = spriteIndex;
+	this.cost = cost;
+	this.descText = desc;
+	this.hungRestore = hungRestore;
+	this.select = function(mode){
+		if(mode !== "buy") return;
+		if(globalVal.money < this.cost){
+			addTempText("NOT ENOUGH MONEY",1);
+			return;
+		}
+		globalVal.money -= this.cost;
+		addTempText("BOUGHT " + this.mainText,1);
+	};
+}
+
+function playItem(name,spriteIndex,cost,useCost,desc,happinessRestore){
+	this.mainText = name;
+	this.spriteIndex = spriteIndex;
+	this.cost = cost;
+	this.useCost = useCost;
+	this.descText = desc;
+	this.happinessRestore = happinessRestore;
+	this.select = function(mode){
+		if(mode !== "buy") return;
+		if(globalVal.money < this.cost){
+			addTempText("NOT ENOUGH MONEY",1);
+			return;
+		}
+		globalVal.money -= this.cost;
+		addTempText("BOUGHT " + this.mainText,1);
+	};
+}
+
 var shop = {
 	preload: function(){	
 	},
