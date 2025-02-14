@@ -1,4 +1,6 @@
-var game = new Phaser.Game(800,800,Phaser.AUTO);
+// 오래된 Phaser 2의 AUTO 렌더러가 최신 브라우저에서 WebGL을 선택하면
+// 검은 화면만 표시되는 경우가 있어 이 픽셀 게임은 Canvas 렌더러로 고정한다.
+var game = new Phaser.Game(800,800,Phaser.CANVAS);
 var height = 800;
 var width = 800;
 var buttonDispX = 50;
