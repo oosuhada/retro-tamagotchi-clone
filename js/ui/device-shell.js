@@ -142,8 +142,23 @@ function removeTempText(){
 
 
 function drawGameBody(){
-	//game.stage.backgroundColor = "#ff6e2b";
-	this.background = this.game.add.sprite(0,0,"background");
+	// Modern LCD surface: keep the original button sprites/functionality, but
+	// remove the legacy bright-green frame artwork that made content feel cramped.
+	game.stage.backgroundColor = "#aebeb6";
+	var lcd = game.add.graphics(0,0);
+	lcd.beginFill(0xaebeb6,1);
+	lcd.drawRect(0,0,width,height);
+	lcd.endFill();
+	lcd.beginFill(0xc7d2cc,1);
+	lcd.drawRoundedRect(28,24,width-56,86,18);
+	lcd.drawRoundedRect(28,height-110,width-56,86,18);
+	lcd.endFill();
+	lcd.lineStyle(2,0x75837c,0.65);
+	lcd.drawRoundedRect(28,24,width-56,86,18);
+	lcd.drawRoundedRect(28,height-110,width-56,86,18);
+	lcd.beginFill(0xb9c8c0,0.55);
+	lcd.drawRoundedRect(72,142,width-144,height-284,24);
+	lcd.endFill();
 	
 	//add buttons
 	//"buttonSheet" is the name of the resource you are loading, changeState is the
@@ -190,12 +205,14 @@ function drawGameBody(){
 	button9.anchor.set(0.5);	
 
 	retroButtons = [button0,button1,button2,button3,button4,button6,button7,button8,button5,button9];
+	for(var i=0;i<retroButtons.length;i++){
+		retroButtons[i].scale.setTo(0.82);
+		retroButtons[i].alpha = 0.9;
+	}
 	retroSelection = Math.min(retroSelection || 0, retroButtons.length-1);
 	updateRetroButtonSelection();
 	installRetroThreeButtonControls();
 
-	var abcText = game.add.bitmapText(game.world.centerX, height-112,"pixel","A     B     C",22);
-	abcText.anchor.set(0.5);
 }
 
 function changeState(button){

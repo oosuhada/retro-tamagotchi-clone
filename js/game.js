@@ -113,7 +113,8 @@ var main = {
 			else if(pet.lifeStage === "teen") petSprite.scale.setTo(0.94);
 			else petSprite.scale.setTo(1);
 		}
-		petSprite.y = petSprite.baseY + (Math.floor(Date.now()/500)%2 === 0 ? -3 : 3);
+		var speed = Math.max(1, Number(globalVal.speedMultiplier) || 1);
+		petSprite.y = petSprite.baseY + (Math.floor(Date.now()/(500/speed))%2 === 0 ? -3 : 3);
 		petSprite.tint = pet.dead ? 0x555555 : pet.sick ? 0x91b871 : 0xffffff;
         
         if(globalVal.counterEnabled){
@@ -188,7 +189,12 @@ var stats = {
 		drawGameBody();
 		pet.happiness = Math.min(Math.max(pet.happiness,0),100);
 		pet.hunger = Math.min(Math.max(pet.hunger,0),100);
-		text = game.add.bitmapText(75, game.world.centerY-200,"pixel","ERROR",32);
+		var statsPanel = game.add.graphics(0,0);
+		statsPanel.beginFill(0xd8e1dc,0.96);
+		statsPanel.lineStyle(3,0x53635b,0.85);
+		statsPanel.drawRoundedRect(88,150,624,500,22);
+		statsPanel.endFill();
+		text = game.add.bitmapText(118, 180,"pixel","ERROR",22);
 
 		
 		
@@ -196,7 +202,17 @@ var stats = {
 	update: function(){
 		tickCheck();
 		var profile = P1DeviceEngine.profile(pet);
-		text.text = "Name: " + pet.name + "\nAge:  "+ pet.age + " day\nCharacter: "+pet.character+"\nStage: "+pet.lifeStage+"\nWeight: "+pet.weight+" oz (min "+profile.minWeight+")\nHungry: "+P1DeviceEngine.hearts(pet.hunger)+"\nHappy:  "+P1DeviceEngine.hearts(pet.happiness)+"\nDiscipline: "+pet.discipline+"%\nCare mistakes: "+pet.careMistakes+"\nDiscipline mistakes: "+pet.disciplineMistakes+"\nSleep: "+padClock(profile.sleep)+":00  Wake: "+padClock(profile.wake)+":00";
+		var partner = typeof DigimonPartners !== "undefined" ? DigimonPartners.get(DigimonPartners.selectedId(pet)) : null;
+		text.text = "NAME  " + pet.name +
+			"\nPARTNER  " + (partner ? partner.name : "-") +
+			"\nSTAGE  " + pet.lifeStage.toUpperCase() +
+			"\nAGE  " + pet.age + " DAY" +
+			"\nWEIGHT  " + pet.weight + " oz" +
+			"\nHUNGRY  " + P1DeviceEngine.hearts(pet.hunger) +
+			"\nHAPPY  " + P1DeviceEngine.hearts(pet.happiness) +
+			"\nDISCIPLINE  " + pet.discipline + "%" +
+			"\nCARE MISTAKES  " + pet.careMistakes +
+			"\nSPEED  " + (globalVal.speedMultiplier || 1) + "x";
 	}
 }
 
@@ -287,12 +303,24 @@ var clock = {
 
 //time per tick, in minutes
 var TIME_PER_TICK = 5;
+var speedCarryMs = 0;
+var lastSpeedCheckAt = Date.now();
 
 //This function checks if the "real world clock" has advanced enough to increment the game a tick.
 //The tick will alter the properties of the pet. 
 function tickCheck(){
-	var processed = P1DeviceEngine.update(pet,globalVal,(new Date()).getTime());
+	var now = Date.now();
+	var processed = P1DeviceEngine.update(pet,globalVal,now);
 	tickCounter += processed;
+	var speed = Math.max(1, Math.min(4, Number(globalVal.speedMultiplier) || 1));
+	var elapsed = Math.max(0, Math.min(5000, now - lastSpeedCheckAt));
+	lastSpeedCheckAt = now;
+	speedCarryMs += elapsed * (speed - 1);
+	while(speedCarryMs >= 60000){
+		P1DeviceEngine.advanceMinutes(pet,globalVal,1);
+		tickCounter++;
+		speedCarryMs -= 60000;
+	}
 }
 
 function tick(){

@@ -263,6 +263,21 @@ var P1DeviceEngine = (function(){
 		evolveIfReady(pet, now);
 	}
 
+	function advanceMinutes(pet, globalVal, minutes){
+		ensureState(pet);
+		var count = Math.max(0, Math.floor(minutes || 0));
+		var now = Date.now();
+		for(var i=0;i<count && !pet.dead;i++){
+			var simulatedNow = now + ((i + 1) * MINUTE);
+			if(pet.character === "Egg") pet.stageAwakeMinutes++;
+			else if(isAwakeAt(pet, simulatedNow)) processAwakeMinute(pet, globalVal, simulatedNow);
+			updateAttention(pet, simulatedNow);
+			evolveIfReady(pet, simulatedNow);
+		}
+		updateSleep(pet, now);
+		clampWeight(pet);
+	}
+
 	function discipline(pet){
 		if(pet.dead || !pet.attention.active || pet.attention.reason !== "discipline") return false;
 		pet.discipline = Math.min(100, pet.discipline + 25);
@@ -376,6 +391,7 @@ var P1DeviceEngine = (function(){
 	return {
 		update:update,
 		forceTick:forceTick,
+		advanceMinutes:advanceMinutes,
 		discipline:discipline,
 		medicine:medicine,
 		feedMeal:feedMeal,

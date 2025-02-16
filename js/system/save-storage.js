@@ -39,6 +39,7 @@ var pet = {
 globalVal ={
 	money : 500,
     counterEnabled: false,
+	speedMultiplier: 1,
 	godMode: false,
 	ezMoney: false,
 	noToilet: false,
