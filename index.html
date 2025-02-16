@@ -31,7 +31,7 @@
 				justify-content: flex-start;
 				width: min(100vw, 52dvh);
 				height: min(100dvh, 192.307vw);
-				padding: 7% 6% 5%;
+				padding: 3.5% 3.5% 3%;
 				box-sizing: border-box;
 				border: 4px solid #18140d;
 				border-radius: 48% 48% 43% 43% / 30% 30% 18% 18%;
@@ -46,18 +46,18 @@
 				letter-spacing: .12em;
 				color: #f49a35;
 				text-shadow: 1px 1px #111;
-				margin: 0 0 2.5%;
+				margin: 0 0 1%;
 			}
 
 			#screen-bezel {
-				width: 88%;
+				width: 96%;
 				aspect-ratio: 1 / 1;
-				padding: 3.5%;
+				padding: 1.5%;
 				box-sizing: border-box;
-				border: 4px solid #141b22;
+				border: 3px solid #141b22;
 				border-radius: 42% 42% 35% 35% / 23% 23% 18% 18%;
 				background: #1c2730;
-				box-shadow: inset 0 0 0 3px #5c6b72;
+				box-shadow: inset 0 0 0 2px #5c6b72;
 				flex: 0 0 auto;
 			}
 
@@ -65,7 +65,7 @@
 				position: relative;
 				width: 100%;
 				height: 100%;
-				border: 3px solid #222;
+				border: 2px solid #222;
 				background: #78856a;
 				box-sizing: border-box;
 				overflow: hidden;
@@ -127,12 +127,66 @@
 				position: absolute;
 				z-index: 60;
 				top: 1.7%;
-				right: 8%;
+				right: 10%;
 				border: 0;
 				background: transparent;
 				color: #f6b75f;
 				font: 900 clamp(7px, 1.1dvh, 10px) monospace;
 				cursor: pointer;
+			}
+
+			#name-change {
+				position: absolute;
+				z-index: 60;
+				top: 1.7%;
+				left: 10%;
+				border: 0;
+				background: transparent;
+				color: #f6b75f;
+				font: 900 clamp(7px, 1.1dvh, 10px) monospace;
+				cursor: pointer;
+			}
+
+			#name-editor {
+				position: absolute;
+				z-index: 70;
+				inset: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 10px;
+				padding: 18px;
+				box-sizing: border-box;
+				background: #9aa77e;
+				color: #182012;
+				font: 900 14px monospace;
+			}
+
+			#name-editor.hidden { display: none; }
+			#name-editor input {
+				width: 82%;
+				border: 3px solid #202719;
+				background: #edf1bf;
+				color: #182012;
+				font: 900 18px monospace;
+				text-align: center;
+				text-transform: uppercase;
+				padding: 8px;
+				outline: 0;
+			}
+
+			#name-editor .name-actions {
+				display: flex;
+				gap: 8px;
+			}
+
+			#name-editor button {
+				border: 3px solid #202719;
+				background: #c9d3a9;
+				color: #182012;
+				font: 900 11px monospace;
+				padding: 7px 12px;
 			}
 
 			#tamagotchi-screen canvas {
@@ -190,17 +244,18 @@
 		<script src="js/phaser.js?v=20260826-2"></script>
 		<script src="js/domain/p1-character-profiles.js?v=20260826-2"></script>
 		<script src="js/domain/digimon-partners.js?v=20260826-4"></script>
-		<script src="js/domain/p1-device-engine.js?v=20260826-2"></script>
+		<script src="js/domain/p1-device-engine.js?v=20260826-5"></script>
 		<script src="js/ui/device-shell.js?v=20260826-2"></script>
 		<script src="js/care/feeding-screen.js?v=20260826-2"></script>
 		<script src="js/care/left-right-game.js?v=20260826-2"></script>
 		<script src="js/shop.js?v=20260826-2"></script>
-		<script src="js/system/save-storage.js?v=20260826-4"></script>
+		<script src="js/system/save-storage.js?v=20260826-5"></script>
 		<script src="js/settings.js?v=20260826-2"></script>
-		<script src="js/game.js?v=20260826-4"></script>
+		<script src="js/game.js?v=20260826-5"></script>
   </head>
   <body>
 	<div id="tamagotchi-console">
+		<button id="name-change" type="button">NAME</button>
 		<button id="partner-change" type="button">PARTNER</button>
 		<div id="screen-bezel"><div id="tamagotchi-screen">
 			<div id="partner-select" class="hidden" aria-label="Choose Digimon partner">
@@ -210,6 +265,14 @@
 				<button class="partner-card" type="button" data-partner="patamon" style="--partner-color:#d99b57;--partner-dark:#7c4a27">PATAMON</button>
 				<button class="partner-card" type="button" data-partner="tentomon" style="--partner-color:#b83b35;--partner-dark:#28304e">TENTOMON</button>
 				<div class="select-help">A PREV · B OK · C NEXT</div>
+			</div>
+			<div id="name-editor" class="hidden" aria-label="Set partner name">
+				<div>SET NAME</div>
+				<input id="partner-name-input" maxlength="10" autocomplete="off" />
+				<div class="name-actions">
+					<button id="name-save" type="button">SAVE</button>
+					<button id="name-cancel" type="button">CANCEL</button>
+				</div>
 			</div>
 		</div></div>
 		<div id="mobile-controls" aria-label="Tamagotchi controls">
@@ -222,6 +285,8 @@
 	<script>
 		(function () {
 			var selector = document.getElementById('partner-select');
+			var nameEditor = document.getElementById('name-editor');
+			var nameInput = document.getElementById('partner-name-input');
 			var cards = Array.prototype.slice.call(document.querySelectorAll('.partner-card'));
 			var selectedIndex = 0;
 			function currentStoredPartner(){ try { return localStorage.getItem('retro-digimon-partner'); } catch (_) { return null; } }
@@ -233,12 +298,37 @@
 			function showSelector(){ syncSelection(currentStoredPartner() || 'agumon'); selector.classList.remove('hidden'); }
 			function choosePartner(id){
 				try { localStorage.setItem('retro-digimon-partner', id); } catch (_) {}
-				if(window.pet && window.DigimonPartners){ DigimonPartners.applyToPet(window.pet,id); if(typeof saveStorage === 'function') saveStorage(); }
+				if(window.pet && window.DigimonPartners){
+					var oldDefault = !window.pet.name || window.pet.name === 'BBQ MAN' || window.pet.name === window.pet.partnerName;
+					DigimonPartners.applyToPet(window.pet,id);
+					if(oldDefault) window.pet.name = window.pet.partnerName;
+					if(typeof saveStorage === 'function') saveStorage();
+				}
 				selector.classList.add('hidden');
 				window.dispatchEvent(new CustomEvent('digimon-partner-change',{detail:{id:id}}));
+				if(!window.pet || !window.pet.name) showNameEditor();
 			}
 			cards.forEach(function(card,index){ card.addEventListener('click', function(){ selectedIndex=index; syncSelection(card.getAttribute('data-partner')); choosePartner(card.getAttribute('data-partner')); }); });
 			document.getElementById('partner-change').addEventListener('click', showSelector);
+			function showNameEditor(){
+				var fallback = window.pet && window.pet.partnerName ? window.pet.partnerName : 'PARTNER';
+				nameInput.value = (window.pet && window.pet.name && window.pet.name !== 'BBQ MAN') ? window.pet.name : fallback;
+				nameEditor.classList.remove('hidden');
+				setTimeout(function(){ nameInput.focus(); nameInput.select(); },0);
+			}
+			function saveName(){
+				var fallback = window.pet && window.pet.partnerName ? window.pet.partnerName : 'PARTNER';
+				var value = nameInput.value.trim().replace(/\s+/g,' ').slice(0,10).toUpperCase() || fallback;
+				if(window.pet){ window.pet.name = value; if(typeof saveStorage === 'function') saveStorage(); }
+				nameEditor.classList.add('hidden');
+			}
+			document.getElementById('name-change').addEventListener('click', showNameEditor);
+			document.getElementById('name-save').addEventListener('click', saveName);
+			document.getElementById('name-cancel').addEventListener('click', function(){ nameEditor.classList.add('hidden'); });
+			nameInput.addEventListener('keydown', function(event){
+				if(event.key === 'Enter'){ event.preventDefault(); saveName(); }
+				if(event.key === 'Escape'){ event.preventDefault(); nameEditor.classList.add('hidden'); }
+			});
 			if(!currentStoredPartner()) showSelector(); else syncSelection(currentStoredPartner());
 			window.addEventListener('keydown', function(event){
 				if(selector.classList.contains('hidden')) return;

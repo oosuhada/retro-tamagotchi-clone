@@ -329,7 +329,7 @@ var P1DeviceEngine = (function(){
 		var partnerId = typeof DigimonPartners !== "undefined" ? DigimonPartners.selectedId(pet) : pet.partnerId;
 		var partnerName = typeof DigimonPartners !== "undefined" ? DigimonPartners.get(partnerId).name : pet.partnerName;
 		var fresh = {
-			name: pet.name || "BBQ MAN",
+			name: pet.name || pet.partnerName || "PARTNER",
 			sex: pet.sex || "M",
 			age: 0,
 			health: 50,

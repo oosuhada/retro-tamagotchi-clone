@@ -1,5 +1,5 @@
 var pet = {
-	name : "BBQ MAN",
+	name : "",
 	sex : "M",
 	age : 0,
 	health : 50,
@@ -81,6 +81,7 @@ function loadStorage(){
     }
 	if(typeof DigimonPartners !== "undefined"){
 		DigimonPartners.applyToPet(pet, DigimonPartners.selectedId(pet));
+		if(!pet.name || pet.name === "BBQ MAN") pet.name = pet.partnerName || "PARTNER";
 	}
 }
 
