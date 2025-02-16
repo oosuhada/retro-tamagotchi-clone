@@ -101,7 +101,6 @@ var DigimonPartners = (function(){
 		var partner = get(id);
 		pet.partnerId = partner.id;
 		pet.partnerName = partner.name;
-		try { localStorage.setItem("retro-digimon-partner", partner.id); } catch (_) {}
 		return partner;
 	}
 
