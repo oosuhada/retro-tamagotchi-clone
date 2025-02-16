@@ -29,17 +29,18 @@ var main = {
 		
 		drawGameBody();
 		
-		//draw pet sprite
-		petSprite = game.add.sprite(this.game.world.centerX,this.game.world.centerY,"petSheet");
-		//change its "center point";
+		var selectedPartnerId = DigimonPartners.selectedId(pet);
+		DigimonPartners.applyToPet(pet, selectedPartnerId);
+		partnerBitmap = DigimonPartners.createBitmap(game, selectedPartnerId);
+		petSprite = game.add.sprite(this.game.world.centerX,this.game.world.centerY,partnerBitmap);
 		petSprite.anchor.setTo(0.5);
-		
-		//adds a custom animation with name,frames wanted in sprite sheet, the fps, and if it wants to be looped.
-		petSprite.animations.add("neutral",[0,1],2,true);
-		petSprite.animations.add("sad",[2,3],2,true);
-		petSprite.animations.add("dead",[4,5],2,true);
-		petSprite.animations.add("happy",[6,7],2,true);
-		petSprite.animations.add("angry",[8,9],2,true);
+		partnerChangeHandler = function(event){
+			var nextId = event && event.detail ? event.detail.id : DigimonPartners.selectedId(pet);
+			DigimonPartners.applyToPet(pet,nextId);
+			partnerBitmap = DigimonPartners.createBitmap(game,nextId);
+			petSprite.loadTexture(partnerBitmap);
+		};
+		window.addEventListener("digimon-partner-change",partnerChangeHandler);
 		counter = game.add.bitmapText(75, game.world.centerY-200,"pixel","tickCounter",32);
 		clockText = game.add.bitmapText(game.world.centerX, 120,"pixel","00:00",26);
 		clockText.anchor.set(0.5);
@@ -56,7 +57,7 @@ var main = {
 		eggGraphic.lineStyle(6,0x222222,1);
 		eggGraphic.drawEllipse(-46,-58,92,116);
 		eggGraphic.endFill();
-		petSprite.play("neutral");
+		petSprite.baseY = this.game.world.centerY;
 		//add Sprites for ailments - conditions that can afflict the pet.
 		sickSprite = game.add.sprite(petSprite.x+50,petSprite.y-50,"ailmentSheet");
 		sickSprite.animations.add("sick",[2,3],2,true);
@@ -86,13 +87,17 @@ var main = {
 		
 		poopArray=[poopSprite0,poopSprite1,poopSprite2];
 	},
+	shutdown: function(){
+		if(typeof partnerChangeHandler === "function") window.removeEventListener("digimon-partner-change",partnerChangeHandler);
+	},
 	
 	update: function(){
 		tickCheck();
 		ailmentCheck();
 		var now = new Date();
 		clockText.text = padClock(now.getHours()) + ":" + padClock(now.getMinutes());
-		stageText.text = pet.character.toUpperCase() + "  " + pet.weight + "oz";
+		var partner = DigimonPartners.get(pet.partnerId);
+		stageText.text = partner.name.toUpperCase() + "  " + pet.lifeStage.toUpperCase() + "  " + pet.weight + "oz";
 		sleepText.text = pet.sleeping ? (pet.lightsOn ? "SLEEPING - LIGHT ON" : "Z Z Z") : "";
 		attentionText.text = pet.attention && pet.attention.active ? "! ATTENTION: " + pet.attention.reason.toUpperCase() : "";
 		deathText.text = pet.dead ? "DEAD: " + pet.deathReason + "  A+C NEW EGG" : "";
@@ -103,14 +108,13 @@ var main = {
 		}else{
 			petSprite.alpha = pet.sleeping && !pet.lightsOn ? 0.25 : 1;
 			eggGraphic.alpha = 0;
-			if(pet.lifeStage === "baby") petSprite.scale.setTo(0.65);
-			else if(pet.lifeStage === "child") petSprite.scale.setTo(0.8);
-			else if(pet.lifeStage === "teen") petSprite.scale.setTo(0.92);
+			if(pet.lifeStage === "baby") petSprite.scale.setTo(0.72);
+			else if(pet.lifeStage === "child") petSprite.scale.setTo(0.84);
+			else if(pet.lifeStage === "teen") petSprite.scale.setTo(0.94);
 			else petSprite.scale.setTo(1);
 		}
-		
-		//play sprite animation according to mood
-		petSprite.play(pet.mood);
+		petSprite.y = petSprite.baseY + (Math.floor(Date.now()/500)%2 === 0 ? -3 : 3);
+		petSprite.tint = pet.dead ? 0x555555 : pet.sick ? 0x91b871 : 0xffffff;
         
         if(globalVal.counterEnabled){
             counter.text = tickCounter;
@@ -169,6 +173,7 @@ var preload = {
 		game.scale.pageAlignVertically = true;
 		game.scale.refresh();
 		loadStorage();
+		if(typeof DigimonPartners !== "undefined") DigimonPartners.applyToPet(pet, DigimonPartners.selectedId(pet));
         //resetStorage();
 		game.state.start("main");
 	}

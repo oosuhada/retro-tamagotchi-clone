@@ -23,6 +23,8 @@ var pet = {
 	lastSimulationAt : (new Date()).getTime(),
 	lifeStage : "egg",
 	character : "Egg",
+	partnerId : null,
+	partnerName : null,
 	attention : {active:false,reason:null,startedAt:null},
 	stageAwakeMinutes : 0,
 	totalAwakeMinutes : 0,
@@ -77,6 +79,9 @@ function loadStorage(){
 		
 		
     }
+	if(typeof DigimonPartners !== "undefined"){
+		DigimonPartners.applyToPet(pet, DigimonPartners.selectedId(pet));
+	}
 }
 
 function saveStorage(){

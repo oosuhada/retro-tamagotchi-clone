@@ -326,6 +326,8 @@ var P1DeviceEngine = (function(){
 
 	function restart(pet){
 		var now = Date.now();
+		var partnerId = typeof DigimonPartners !== "undefined" ? DigimonPartners.selectedId(pet) : pet.partnerId;
+		var partnerName = typeof DigimonPartners !== "undefined" ? DigimonPartners.get(partnerId).name : pet.partnerName;
 		var fresh = {
 			name: pet.name || "BBQ MAN",
 			sex: pet.sex || "M",
@@ -351,6 +353,8 @@ var P1DeviceEngine = (function(){
 			lastSimulationAt: now,
 			lifeStage: "egg",
 			character: "Egg",
+			partnerId: partnerId || null,
+			partnerName: partnerName || null,
 			attention: { active:false, reason:null, startedAt:null },
 			stageAwakeMinutes: 0,
 			totalAwakeMinutes: 0,
