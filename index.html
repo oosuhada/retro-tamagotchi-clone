@@ -10,7 +10,7 @@
 				width: 100%;
 				height: 100%;
 				margin: 0;
-				background: #050505;
+				background: #d9dde1;
 				overflow: hidden;
 			}
 
@@ -29,35 +29,40 @@
 				flex-direction: column;
 				align-items: center;
 				justify-content: flex-start;
-				width: min(100vw, 52dvh);
-				height: min(100dvh, 192.307vw);
-				padding: 3.5% 3.5% 3%;
+				width: min(100vw, 72dvh, 560px);
+				height: min(100dvh, 138.889vw, 778px);
+				padding: 10px 10px 14px;
 				box-sizing: border-box;
-				border: 4px solid #18140d;
-				border-radius: 48% 48% 43% 43% / 30% 30% 18% 18%;
-				background: #344252;
-				box-shadow: inset 0 0 0 5px #526274, inset 0 -18px 0 rgba(0,0,0,.28), 0 0 0 2px #000;
+				border: 1px solid #bdc4ca;
+				border-radius: 34px;
+				background: linear-gradient(180deg,#fbfbfb 0%,#f3f4f5 72%,#e7eaed 100%);
+				box-shadow: 0 10px 30px rgba(24,34,44,.22), inset 0 1px 0 #fff;
 				overflow: hidden;
 			}
 
 			#tamagotchi-console::before {
-				content: "DIGITAL MONSTER";
-				font: bold clamp(11px, 2dvh, 18px) monospace;
-				letter-spacing: .12em;
-				color: #f49a35;
-				text-shadow: 1px 1px #111;
-				margin: 0 0 1%;
+				content: "DIGITAL PET";
+				position: absolute;
+				z-index: 65;
+				top: 15px;
+				left: 50%;
+				transform: translateX(-50%);
+				font: 800 9px/1 system-ui,sans-serif;
+				letter-spacing: .18em;
+				color: rgba(62,70,76,.62);
+				pointer-events: none;
 			}
 
 			#screen-bezel {
-				width: 96%;
+				width: 100%;
 				aspect-ratio: 1 / 1;
-				padding: 1.5%;
+				padding: 5px;
+				margin-top: 26px;
 				box-sizing: border-box;
-				border: 3px solid #141b22;
-				border-radius: 42% 42% 35% 35% / 23% 23% 18% 18%;
-				background: #1c2730;
-				box-shadow: inset 0 0 0 2px #5c6b72;
+				border: 1px solid #aab2b8;
+				border-radius: 24px;
+				background: #dce2e2;
+				box-shadow: inset 0 1px 2px rgba(0,0,0,.18), 0 1px 0 #fff;
 				flex: 0 0 auto;
 			}
 
@@ -65,8 +70,9 @@
 				position: relative;
 				width: 100%;
 				height: 100%;
-				border: 2px solid #222;
-				background: #78856a;
+				border: 1px solid #67746f;
+				border-radius: 19px;
+				background: #aebeb6;
 				box-sizing: border-box;
 				overflow: hidden;
 			}
@@ -78,11 +84,11 @@
 				display: grid;
 				grid-template-columns: 1fr 1fr;
 				grid-template-rows: auto 1fr 1fr auto;
-				gap: 5px;
-				padding: 10px;
+				gap: 6px;
+				padding: 12px;
 				box-sizing: border-box;
-				background: #9aa77e;
-				color: #182012;
+				background: #afbeb5;
+				color: #17221d;
 				font-family: monospace;
 			}
 
@@ -97,15 +103,16 @@
 			.partner-card {
 				position: relative;
 				min-width: 0;
-				border: 3px solid #202719;
-				background: #c9d3a9;
+				border: 1px solid #607067;
+				border-radius: 12px;
+				background: rgba(226,234,223,.66);
 				color: #182012;
 				font: 900 clamp(8px, 1.25dvh, 11px) monospace;
 				text-transform: uppercase;
-				box-shadow: inset 0 -3px rgba(0,0,0,.14);
+				box-shadow: inset 0 -2px rgba(0,0,0,.08);
 				cursor: pointer;
 			}
-			.partner-card.selected { background: #edf1bf; outline: 2px solid #111; }
+			.partner-card.selected { background: #e8efe4; outline: 2px solid #33423b; }
 			.partner-card::before {
 				content: "";
 				display: block;
@@ -126,24 +133,28 @@
 			#partner-change {
 				position: absolute;
 				z-index: 60;
-				top: 1.7%;
-				right: 10%;
-				border: 0;
-				background: transparent;
-				color: #f6b75f;
-				font: 900 clamp(7px, 1.1dvh, 10px) monospace;
+				top: 8px;
+				right: 13px;
+				border: 1px solid #c2c8cc;
+				border-radius: 999px;
+				background: rgba(255,255,255,.7);
+				color: #505a61;
+				font: 800 8px system-ui,sans-serif;
+				padding: 5px 8px;
 				cursor: pointer;
 			}
 
 			#name-change {
 				position: absolute;
 				z-index: 60;
-				top: 1.7%;
-				left: 10%;
-				border: 0;
-				background: transparent;
-				color: #f6b75f;
-				font: 900 clamp(7px, 1.1dvh, 10px) monospace;
+				top: 8px;
+				left: 13px;
+				border: 1px solid #c2c8cc;
+				border-radius: 999px;
+				background: rgba(255,255,255,.7);
+				color: #505a61;
+				font: 800 8px system-ui,sans-serif;
+				padding: 5px 8px;
 				cursor: pointer;
 			}
 
@@ -158,7 +169,7 @@
 				gap: 10px;
 				padding: 18px;
 				box-sizing: border-box;
-				background: #9aa77e;
+				background: #afbeb5;
 				color: #182012;
 				font: 900 14px monospace;
 			}
@@ -200,24 +211,24 @@
 			#mobile-controls {
 				display: flex;
 				position: relative;
-				width: 86%;
-				margin-top: auto;
-				margin-bottom: 3%;
+				width: 78%;
+				margin-top: 14px;
+				margin-bottom: 0;
 				z-index: 9999;
 				justify-content: space-around;
-				align-items: flex-end;
-				gap: 5%;
+				align-items: center;
+				gap: 8%;
 			}
 
 			#mobile-controls button {
-				width: clamp(48px, 9dvh, 70px);
-				height: clamp(48px, 9dvh, 70px);
-				border: 4px solid #171717;
+				width: clamp(46px, 7.4dvh, 62px);
+				height: clamp(46px, 7.4dvh, 62px);
+				border: 0;
 				border-radius: 50%;
-				background: #e58d32;
-				box-shadow: inset 0 -5px 0 rgba(0,0,0,0.2), 0 3px 0 #000;
-				color: #2b150d;
-				font: bold clamp(19px, 3dvh, 26px) monospace;
+				background: #f3a423;
+				box-shadow: inset 0 -3px 0 rgba(135,73,0,.24), 0 2px 5px rgba(0,0,0,.22);
+				color: #5a3000;
+				font: 800 clamp(17px, 2.5dvh, 22px) system-ui,sans-serif;
 				pointer-events: auto;
 				touch-action: none;
 				-webkit-user-select: none;
@@ -227,18 +238,34 @@
 			#mobile-controls button:active,
 			#mobile-controls button.pressed {
 				transform: translateY(3px);
-				box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2), 0 0 0 #000;
+				box-shadow: inset 0 -1px 0 rgba(0,0,0,0.16), 0 1px 2px rgba(0,0,0,.18);
 			}
 
 			#mobile-controls .hint {
 				position: absolute;
-				bottom: calc(100% + 6px);
+				bottom: calc(100% + 5px);
 				left: 0;
 				right: 0;
 				text-align: center;
-				font: bold clamp(8px, 1.35dvh, 11px) monospace;
-				color: #d7e0e8;
+				font: 700 clamp(7px, 1.05dvh, 9px) system-ui,sans-serif;
+				color: #6e777d;
 				text-shadow: none;
+			}
+
+			#mobile-controls button:nth-of-type(1) { background: #2777d8; color: #fff; }
+			#mobile-controls button:nth-of-type(2) { background: #f2b22e; color: #6b4300; }
+			#mobile-controls button:nth-of-type(3) { background: #e44738; color: #fff; }
+
+			@media (max-width: 520px) {
+				#tamagotchi-console {
+					width: 100vw;
+					height: 100dvh;
+					border-radius: 0;
+					border: 0;
+					box-shadow: none;
+					padding: 8px 8px 12px;
+				}
+				#screen-bezel { margin-top: 24px; }
 			}
 		</style>
 		<script src="js/phaser.js?v=20260826-2"></script>
