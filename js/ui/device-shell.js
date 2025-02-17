@@ -157,27 +157,39 @@ function drawGameBody(){
 	//"buttonSheet" is the name of the resource you are loading, changeState is the
 	//function you want to execute on click, and the last thee numbers correspond to the 
 	//frames you want in your buttonSheet in order of "out,over,clicked"
-	button0 = game.add.button(width*(1/6) ,buttonDispX,"buttonSheet",changeState,this,0,0,0);
+	var nameControl = game.add.bitmapText(34,buttonDispX-8,"pixel","NAME",18);
+	nameControl.name = "name";
+	nameControl.anchor.set(0,0.5);
+	nameControl.inputEnabled = true;
+	nameControl.events.onInputDown.add(function(){ changeState(nameControl); });
+
+	button0 = game.add.button(width*(1.55/7) ,buttonDispX,"buttonSheet",changeState,this,0,0,0);
 	button0.name = "stats";
 	button0.anchor.set(0.5);
 	
-	button1 = game.add.button(width*(2/6) ,buttonDispX,"buttonSheet",changeState,this,2,2,2);
+	button1 = game.add.button(width*(2.55/7) ,buttonDispX,"buttonSheet",changeState,this,2,2,2);
 	button1.name = "food";
 	button1.anchor.set(0.5);
 		
-	button2 = game.add.button(width*(3/6) ,buttonDispX,"buttonSheet",changeState,this,1,1,1);
+	button2 = game.add.button(width*(3.55/7) ,buttonDispX,"buttonSheet",changeState,this,1,1,1);
 	button2.name = "toilet";
 	button2.anchor.set(0.5);
 		
-	button3 = game.add.button(width*(4/6) ,buttonDispX,"buttonSheet",changeState,this,3,3,3);
+	button3 = game.add.button(width*(4.55/7) ,buttonDispX,"buttonSheet",changeState,this,3,3,3);
 	button3.name = "play";
 	button3.anchor.set(0.5);
 		
-	button4 = game.add.button(width*(5/6) ,buttonDispX,"buttonSheet",changeState,this,4,4,4);
+	button4 = game.add.button(width*(5.55/7) ,buttonDispX,"buttonSheet",changeState,this,4,4,4);
 	button4.name = "speed";
 	button4.anchor.set(0.5);
-	var speedLabel = game.add.bitmapText(width*(5/6),92,"pixel",getSpeedLabel(),18);
+	var speedLabel = game.add.bitmapText(width*(5.55/7),92,"pixel",getSpeedLabel(),18);
 	speedLabel.anchor.set(0.5);
+
+	var partnerControl = game.add.bitmapText(width-34,buttonDispX-8,"pixel","PARTNER",18);
+	partnerControl.name = "partner";
+	partnerControl.anchor.set(1,0.5);
+	partnerControl.inputEnabled = true;
+	partnerControl.events.onInputDown.add(function(){ changeState(partnerControl); });
 		
 	button5 = game.add.button(width*(1/6) ,height-buttonDispX,"buttonSheet",changeState,this,5,5,5);
 	button5.name = "save";
@@ -199,7 +211,7 @@ function drawGameBody(){
 	button9.name = "clock";
 	button9.anchor.set(0.5);	
 
-	retroButtons = [button0,button1,button2,button3,button4,button6,button7,button8,button5,button9];
+	retroButtons = [nameControl,button0,button1,button2,button3,button4,partnerControl,button6,button7,button8,button5,button9];
 	for(var i=0;i<retroButtons.length;i++){
 		retroButtons[i].scale.setTo(0.82);
 		retroButtons[i].alpha = 0.9;
@@ -212,6 +224,14 @@ function drawGameBody(){
 
 function changeState(button){
 		console.log(button.name);
+		if(button.name === "name"){
+			if(typeof window.showDigimonNameEditor === "function") window.showDigimonNameEditor();
+			return;
+		}
+		if(button.name === "partner"){
+			if(typeof window.showDigimonPartnerSelector === "function") window.showDigimonPartnerSelector();
+			return;
+		}
 		if(button.name === "speed"){
 			cycleGameSpeed();
 			game.state.start("main");
