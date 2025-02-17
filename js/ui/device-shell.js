@@ -149,13 +149,6 @@ function drawGameBody(){
 	lcd.beginFill(0xaebeb6,1);
 	lcd.drawRect(0,0,width,height);
 	lcd.endFill();
-	lcd.beginFill(0xc7d2cc,1);
-	lcd.drawRoundedRect(28,24,width-56,86,18);
-	lcd.drawRoundedRect(28,height-110,width-56,86,18);
-	lcd.endFill();
-	lcd.lineStyle(2,0x75837c,0.65);
-	lcd.drawRoundedRect(28,24,width-56,86,18);
-	lcd.drawRoundedRect(28,height-110,width-56,86,18);
 	lcd.beginFill(0xb9c8c0,0.55);
 	lcd.drawRoundedRect(72,142,width-144,height-284,24);
 	lcd.endFill();

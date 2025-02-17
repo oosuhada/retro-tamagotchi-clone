@@ -42,7 +42,7 @@ var main = {
 		};
 		window.addEventListener("digimon-partner-change",partnerChangeHandler);
 		counter = game.add.bitmapText(75, game.world.centerY-200,"pixel","tickCounter",32);
-		clockText = game.add.bitmapText(game.world.centerX, 120,"pixel","00:00",26);
+		clockText = game.add.bitmapText(game.world.centerX, 112,"pixel","00:00",24);
 		clockText.anchor.set(0.5);
 		stageText = game.add.bitmapText(game.world.centerX, game.world.centerY+150,"pixel","EGG",24);
 		stageText.anchor.set(0.5);

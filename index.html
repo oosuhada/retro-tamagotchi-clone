@@ -40,19 +40,6 @@
 				overflow: hidden;
 			}
 
-			#tamagotchi-console::before {
-				content: "DIGITAL PET";
-				position: absolute;
-				z-index: 65;
-				top: 15px;
-				left: 50%;
-				transform: translateX(-50%);
-				font: 800 9px/1 system-ui,sans-serif;
-				letter-spacing: .18em;
-				color: rgba(62,70,76,.62);
-				pointer-events: none;
-			}
-
 			#screen-bezel {
 				width: 100%;
 				aspect-ratio: 1 / 1;
@@ -211,22 +198,41 @@
 			#mobile-controls {
 				display: flex;
 				position: relative;
-				flex-direction: column;
-				width: 78%;
-				margin-top: 26px;
+				width: 82%;
+				margin-top: 22px;
 				margin-bottom: 0;
 				z-index: 9999;
 				justify-content: center;
 				align-items: center;
-				gap: 12px;
 			}
 
 			#mobile-controls .button-row {
 				display: flex;
 				width: 100%;
-				justify-content: space-around;
+				justify-content: space-between;
+				align-items: flex-start;
+				gap: 7%;
+			}
+
+			#mobile-controls .control-key {
+				display: flex;
+				flex: 1 1 0;
+				min-width: 0;
+				flex-direction: column;
 				align-items: center;
-				gap: 8%;
+				justify-content: flex-start;
+				gap: 13px;
+			}
+
+			#mobile-controls .control-label {
+				min-height: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #6e777d;
+				font: 700 clamp(7px, 1.05dvh, 9px)/1.2 system-ui,sans-serif;
+				text-align: center;
+				white-space: nowrap;
 			}
 
 			#mobile-controls button {
@@ -250,15 +256,6 @@
 				box-shadow: inset 0 -1px 0 rgba(0,0,0,0.16), 0 1px 2px rgba(0,0,0,.18);
 			}
 
-			#mobile-controls .hint {
-				position: static;
-				width: 100%;
-				text-align: center;
-				font: 700 clamp(7px, 1.05dvh, 9px) system-ui,sans-serif;
-				color: #6e777d;
-				text-shadow: none;
-			}
-
 			#speed-change {
 				position: absolute;
 				z-index: 66;
@@ -274,9 +271,9 @@
 				cursor: pointer;
 			}
 
-			#mobile-controls button:nth-of-type(1) { background: #2777d8; color: #fff; }
-			#mobile-controls button:nth-of-type(2) { background: #f2b22e; color: #6b4300; }
-			#mobile-controls button:nth-of-type(3) { background: #e44738; color: #fff; }
+			#mobile-controls button[data-key="65"] { background: #2777d8; color: #fff; }
+			#mobile-controls button[data-key="66"] { background: #f2b22e; color: #6b4300; }
+			#mobile-controls button[data-key="67"] { background: #e44738; color: #fff; }
 
 			@media (max-width: 520px) {
 				#tamagotchi-console {
@@ -294,13 +291,13 @@
 		<script src="js/domain/p1-character-profiles.js?v=20260826-2"></script>
 		<script src="js/domain/digimon-partners.js?v=20260826-7"></script>
 		<script src="js/domain/p1-device-engine.js?v=20260826-6"></script>
-		<script src="js/ui/device-shell.js?v=20260826-6"></script>
+		<script src="js/ui/device-shell.js?v=20260826-8"></script>
 		<script src="js/care/feeding-screen.js?v=20260826-2"></script>
 		<script src="js/care/left-right-game.js?v=20260826-2"></script>
 		<script src="js/shop.js?v=20260826-2"></script>
 		<script src="js/system/save-storage.js?v=20260826-6"></script>
 		<script src="js/settings.js?v=20260826-2"></script>
-		<script src="js/game.js?v=20260826-6"></script>
+		<script src="js/game.js?v=20260826-8"></script>
   </head>
   <body>
 	<div id="tamagotchi-console">
@@ -326,11 +323,19 @@
 			</div>
 		</div></div>
 		<div id="mobile-controls" aria-label="Tamagotchi controls">
-			<div class="hint">A SELECT / LEFT · B OK / RIGHT · C BACK</div>
 			<div class="button-row">
-				<button type="button" data-key="65" aria-label="A button">A</button>
-				<button type="button" data-key="66" aria-label="B button">B</button>
-				<button type="button" data-key="67" aria-label="C button">C</button>
+				<div class="control-key">
+					<div class="control-label">SELECT / LEFT</div>
+					<button type="button" data-key="65" aria-label="A button">A</button>
+				</div>
+				<div class="control-key">
+					<div class="control-label">OK / RIGHT</div>
+					<button type="button" data-key="66" aria-label="B button">B</button>
+				</div>
+				<div class="control-key">
+					<div class="control-label">BACK</div>
+					<button type="button" data-key="67" aria-label="C button">C</button>
+				</div>
 			</div>
 		</div>
 	</div>
