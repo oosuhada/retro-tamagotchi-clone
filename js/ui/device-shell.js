@@ -174,8 +174,10 @@ function drawGameBody(){
 	button3.anchor.set(0.5);
 		
 	button4 = game.add.button(width*(5/6) ,buttonDispX,"buttonSheet",changeState,this,4,4,4);
-	button4.name = "discipline";
+	button4.name = "speed";
 	button4.anchor.set(0.5);
+	var speedLabel = game.add.bitmapText(width*(5/6),92,"pixel",getSpeedLabel(),18);
+	speedLabel.anchor.set(0.5);
 		
 	button5 = game.add.button(width*(1/6) ,height-buttonDispX,"buttonSheet",changeState,this,5,5,5);
 	button5.name = "save";
@@ -190,11 +192,11 @@ function drawGameBody(){
 	button7.anchor.set(0.5);	
 	
 	button8 = game.add.button(width*(4/6) ,height-buttonDispX,"buttonSheet",changeState,this,8,8,8);
-	button8.name = "clock";
+	button8.name = "discipline";
 	button8.anchor.set(0.5);	
 	
 	button9 = game.add.button(width*(5/6) ,height-buttonDispX,"buttonSheet",changeState,this,9,9,9);
-	button9.name = "main";
+	button9.name = "clock";
 	button9.anchor.set(0.5);	
 
 	retroButtons = [button0,button1,button2,button3,button4,button6,button7,button8,button5,button9];
@@ -210,7 +212,27 @@ function drawGameBody(){
 
 function changeState(button){
 		console.log(button.name);
+		if(button.name === "speed"){
+			cycleGameSpeed();
+			game.state.start("main");
+			return;
+		}
 		game.state.start(button.name);
+}
+
+function getGameSpeed(){
+	var speed = globalVal ? Number(globalVal.speedMultiplier) : 1;
+	return speed === 2 || speed === 4 ? speed : 1;
+}
+
+function getSpeedLabel(){
+	return getGameSpeed() + "x";
+}
+
+function cycleGameSpeed(){
+	var speed = getGameSpeed();
+	globalVal.speedMultiplier = speed === 1 ? 2 : (speed === 2 ? 4 : 1);
+	if(typeof saveStorage === "function") saveStorage();
 }
 
 var retroButtons = [];

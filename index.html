@@ -256,21 +256,6 @@
 				box-shadow: inset 0 -1px 0 rgba(0,0,0,0.16), 0 1px 2px rgba(0,0,0,.18);
 			}
 
-			#speed-change {
-				position: absolute;
-				z-index: 66;
-				top: 8px;
-				left: 50%;
-				transform: translateX(-50%);
-				border: 1px solid #c2c8cc;
-				border-radius: 999px;
-				background: rgba(255,255,255,.78);
-				color: #505a61;
-				font: 800 8px system-ui,sans-serif;
-				padding: 5px 9px;
-				cursor: pointer;
-			}
-
 			#mobile-controls button[data-key="65"] { background: #2777d8; color: #fff; }
 			#mobile-controls button[data-key="66"] { background: #f2b22e; color: #6b4300; }
 			#mobile-controls button[data-key="67"] { background: #e44738; color: #fff; }
@@ -291,7 +276,7 @@
 		<script src="js/domain/p1-character-profiles.js?v=20260826-2"></script>
 		<script src="js/domain/digimon-partners.js?v=20260826-7"></script>
 		<script src="js/domain/p1-device-engine.js?v=20260826-6"></script>
-		<script src="js/ui/device-shell.js?v=20260826-8"></script>
+		<script src="js/ui/device-shell.js?v=20260826-9"></script>
 		<script src="js/care/feeding-screen.js?v=20260826-2"></script>
 		<script src="js/care/left-right-game.js?v=20260826-2"></script>
 		<script src="js/shop.js?v=20260826-2"></script>
@@ -302,7 +287,6 @@
   <body>
 	<div id="tamagotchi-console">
 		<button id="name-change" type="button">NAME</button>
-		<button id="speed-change" type="button">SPEED 1x</button>
 		<button id="partner-change" type="button">PARTNER</button>
 		<div id="screen-bezel"><div id="tamagotchi-screen">
 			<div id="partner-select" class="hidden" aria-label="Choose Digimon partner">
@@ -345,7 +329,6 @@
 			var nameEditor = document.getElementById('name-editor');
 			var nameInput = document.getElementById('partner-name-input');
 			var cards = Array.prototype.slice.call(document.querySelectorAll('.partner-card'));
-			var speedButton = document.getElementById('speed-change');
 			var selectedIndex = 0;
 			function currentStoredPartner(){ try { return localStorage.getItem('retro-digimon-partner'); } catch (_) { return null; } }
 			function syncSelection(id){
@@ -383,18 +366,6 @@
 			document.getElementById('name-change').addEventListener('click', showNameEditor);
 			document.getElementById('name-save').addEventListener('click', saveName);
 			document.getElementById('name-cancel').addEventListener('click', function(){ nameEditor.classList.add('hidden'); });
-			function currentSpeed(){
-				var speed = window.globalVal ? Number(window.globalVal.speedMultiplier) : 1;
-				return speed === 2 || speed === 4 ? speed : 1;
-			}
-			function renderSpeed(){ speedButton.textContent = 'SPEED ' + currentSpeed() + 'x'; }
-			speedButton.addEventListener('click', function(){
-				var speed = currentSpeed();
-				var next = speed === 1 ? 2 : (speed === 2 ? 4 : 1);
-				if(window.globalVal){ window.globalVal.speedMultiplier = next; if(typeof saveStorage === 'function') saveStorage(); }
-				renderSpeed();
-			});
-			setTimeout(renderSpeed,0);
 			nameInput.addEventListener('keydown', function(event){
 				if(event.key === 'Enter'){ event.preventDefault(); saveName(); }
 				if(event.key === 'Escape'){ event.preventDefault(); nameEditor.classList.add('hidden'); }
