@@ -153,55 +153,56 @@ function drawGameBody(){
 	lcd.drawRoundedRect(72,142,width-144,height-284,24);
 	lcd.endFill();
 	
-	// Top row: NAME + 3 primary controls + PARTNER.
-	// Bottom row: the remaining 7 controls. This keeps all 10 game functions
-	// visible without colliding with the two profile actions.
-	var nameControl = createLcdTextButton(66, buttonDispX, "NAME", "name");
+	// Both rows share exactly the same left/right safe margin. The only
+	// difference is the number of equally-spaced slots in each row.
+	var controlMargin = 72;
+	var topXs = evenlySpacedControlXs(5, controlMargin);
+	var bottomXs = evenlySpacedControlXs(7, controlMargin);
+	var nameControl = createLcdTextButton(topXs[0], buttonDispX, "NAME", "name", 102);
 
-	button0 = game.add.button(width*(2/6) ,buttonDispX,"buttonSheet",changeState,this,0,0,0);
+	button0 = game.add.button(topXs[1],buttonDispX,"buttonSheet",changeState,this,0,0,0);
 	button0.name = "stats";
 	button0.anchor.set(0.5);
 	
-	button1 = game.add.button(width*(3/6) ,buttonDispX,"buttonSheet",changeState,this,2,2,2);
+	button1 = game.add.button(topXs[2],buttonDispX,"buttonSheet",changeState,this,2,2,2);
 	button1.name = "food";
 	button1.anchor.set(0.5);
 
-	button4 = game.add.button(width*(4/6) ,buttonDispX,"buttonSheet",changeState,this,4,4,4);
+	button4 = game.add.button(topXs[3],buttonDispX,"buttonSheet",changeState,this,4,4,4);
 	button4.name = "speed";
 	button4.anchor.set(0.5);
-	var speedLabel = game.add.bitmapText(width*(4/6),92,"pixel",getSpeedLabel(),18);
+	var speedLabel = game.add.bitmapText(topXs[3],92,"pixel",getSpeedLabel(),18);
 	speedLabel.anchor.set(0.5);
 
-	var partnerControl = createLcdTextButton(width-66, buttonDispX, "PARTNER", "partner");
+	var partnerControl = createLcdTextButton(topXs[4], buttonDispX, "PARTNER", "partner", 102);
 
 	var bottomY = height-buttonDispX;
-	var bottomGap = width/8;
 
-	button2 = game.add.button(bottomGap*1,bottomY,"buttonSheet",changeState,this,1,1,1);
+	button2 = game.add.button(bottomXs[0],bottomY,"buttonSheet",changeState,this,1,1,1);
 	button2.name = "toilet";
 	button2.anchor.set(0.5);
 
-	button3 = game.add.button(bottomGap*2,bottomY,"buttonSheet",changeState,this,3,3,3);
+	button3 = game.add.button(bottomXs[1],bottomY,"buttonSheet",changeState,this,3,3,3);
 	button3.name = "play";
 	button3.anchor.set(0.5);
 
-	button6 = game.add.button(bottomGap*3,bottomY,"buttonSheet",changeState,this,6,6,6);
+	button6 = game.add.button(bottomXs[2],bottomY,"buttonSheet",changeState,this,6,6,6);
 	button6.name = "medicine";
 	button6.anchor.set(0.5);
 
-	button7 = game.add.button(bottomGap*4,bottomY,"buttonSheet",changeState,this,7,7,7);
+	button7 = game.add.button(bottomXs[3],bottomY,"buttonSheet",changeState,this,7,7,7);
 	button7.name = "lights";
 	button7.anchor.set(0.5);	
 	
-	button8 = game.add.button(bottomGap*5,bottomY,"buttonSheet",changeState,this,8,8,8);
+	button8 = game.add.button(bottomXs[4],bottomY,"buttonSheet",changeState,this,8,8,8);
 	button8.name = "discipline";
 	button8.anchor.set(0.5);	
 
-	button5 = game.add.button(bottomGap*6,bottomY,"buttonSheet",changeState,this,5,5,5);
+	button5 = game.add.button(bottomXs[5],bottomY,"buttonSheet",changeState,this,5,5,5);
 	button5.name = "save";
 	button5.anchor.set(0.5);
 
-	button9 = game.add.button(bottomGap*7,bottomY,"buttonSheet",changeState,this,9,9,9);
+	button9 = game.add.button(bottomXs[6],bottomY,"buttonSheet",changeState,this,9,9,9);
 	button9.name = "clock";
 	button9.anchor.set(0.5);	
 
@@ -217,17 +218,31 @@ function drawGameBody(){
 
 }
 
-function createLcdTextButton(x,y,label,name){
+function evenlySpacedControlXs(count, margin){
+	var result = [];
+	var usableWidth = width - (margin * 2);
+	var gap = count > 1 ? usableWidth / (count - 1) : 0;
+	for(var i=0;i<count;i++) result.push(margin + gap*i);
+	return result;
+}
+
+function createLcdTextButton(x,y,label,name,buttonWidth){
+	buttonWidth = buttonWidth || 102;
 	var control = game.add.graphics(x,y);
 	control.beginFill(0xd8e2dd,0.96);
 	control.lineStyle(2,0x68766f,0.9);
-	control.drawRoundedRect(-50,-23,100,46,12);
+	control.drawRoundedRect(-buttonWidth/2,-23,buttonWidth,46,12);
 	control.endFill();
 	control.name = name;
 	control.inputEnabled = true;
 	control.events.onInputDown.add(function(){ changeState(control); });
 	var text = game.add.bitmapText(x,y,"pixel",label,16);
 	text.anchor.set(0.5);
+	var maxTextWidth = buttonWidth - 16;
+	if(text.width > maxTextWidth){
+		var fitScale = maxTextWidth / text.width;
+		text.scale.setTo(fitScale);
+	}
 	text.inputEnabled = true;
 	text.events.onInputDown.add(function(){ changeState(control); });
 	control.labelText = text;
