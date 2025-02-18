@@ -153,73 +153,85 @@ function drawGameBody(){
 	lcd.drawRoundedRect(72,142,width-144,height-284,24);
 	lcd.endFill();
 	
-	//add buttons
-	//"buttonSheet" is the name of the resource you are loading, changeState is the
-	//function you want to execute on click, and the last thee numbers correspond to the 
-	//frames you want in your buttonSheet in order of "out,over,clicked"
-	var nameControl = game.add.bitmapText(34,buttonDispX-8,"pixel","NAME",18);
-	nameControl.name = "name";
-	nameControl.anchor.set(0,0.5);
-	nameControl.inputEnabled = true;
-	nameControl.events.onInputDown.add(function(){ changeState(nameControl); });
+	// Top row: NAME + 3 primary controls + PARTNER.
+	// Bottom row: the remaining 7 controls. This keeps all 10 game functions
+	// visible without colliding with the two profile actions.
+	var nameControl = createLcdTextButton(66, buttonDispX, "NAME", "name");
 
-	button0 = game.add.button(width*(1.55/7) ,buttonDispX,"buttonSheet",changeState,this,0,0,0);
+	button0 = game.add.button(width*(2/6) ,buttonDispX,"buttonSheet",changeState,this,0,0,0);
 	button0.name = "stats";
 	button0.anchor.set(0.5);
 	
-	button1 = game.add.button(width*(2.55/7) ,buttonDispX,"buttonSheet",changeState,this,2,2,2);
+	button1 = game.add.button(width*(3/6) ,buttonDispX,"buttonSheet",changeState,this,2,2,2);
 	button1.name = "food";
 	button1.anchor.set(0.5);
-		
-	button2 = game.add.button(width*(3.55/7) ,buttonDispX,"buttonSheet",changeState,this,1,1,1);
-	button2.name = "toilet";
-	button2.anchor.set(0.5);
-		
-	button3 = game.add.button(width*(4.55/7) ,buttonDispX,"buttonSheet",changeState,this,3,3,3);
-	button3.name = "play";
-	button3.anchor.set(0.5);
-		
-	button4 = game.add.button(width*(5.55/7) ,buttonDispX,"buttonSheet",changeState,this,4,4,4);
+
+	button4 = game.add.button(width*(4/6) ,buttonDispX,"buttonSheet",changeState,this,4,4,4);
 	button4.name = "speed";
 	button4.anchor.set(0.5);
-	var speedLabel = game.add.bitmapText(width*(5.55/7),92,"pixel",getSpeedLabel(),18);
+	var speedLabel = game.add.bitmapText(width*(4/6),92,"pixel",getSpeedLabel(),18);
 	speedLabel.anchor.set(0.5);
 
-	var partnerControl = game.add.bitmapText(width-34,buttonDispX-8,"pixel","PARTNER",18);
-	partnerControl.name = "partner";
-	partnerControl.anchor.set(1,0.5);
-	partnerControl.inputEnabled = true;
-	partnerControl.events.onInputDown.add(function(){ changeState(partnerControl); });
-		
-	button5 = game.add.button(width*(1/6) ,height-buttonDispX,"buttonSheet",changeState,this,5,5,5);
-	button5.name = "save";
-	button5.anchor.set(0.5);
-	
-	button6 = game.add.button(width*(2/6) ,height-buttonDispX,"buttonSheet",changeState,this,6,6,6);
+	var partnerControl = createLcdTextButton(width-66, buttonDispX, "PARTNER", "partner");
+
+	var bottomY = height-buttonDispX;
+	var bottomGap = width/8;
+
+	button2 = game.add.button(bottomGap*1,bottomY,"buttonSheet",changeState,this,1,1,1);
+	button2.name = "toilet";
+	button2.anchor.set(0.5);
+
+	button3 = game.add.button(bottomGap*2,bottomY,"buttonSheet",changeState,this,3,3,3);
+	button3.name = "play";
+	button3.anchor.set(0.5);
+
+	button6 = game.add.button(bottomGap*3,bottomY,"buttonSheet",changeState,this,6,6,6);
 	button6.name = "medicine";
 	button6.anchor.set(0.5);
 
-	button7 = game.add.button(width*(3/6) ,height-buttonDispX,"buttonSheet",changeState,this,7,7,7);
+	button7 = game.add.button(bottomGap*4,bottomY,"buttonSheet",changeState,this,7,7,7);
 	button7.name = "lights";
 	button7.anchor.set(0.5);	
 	
-	button8 = game.add.button(width*(4/6) ,height-buttonDispX,"buttonSheet",changeState,this,8,8,8);
+	button8 = game.add.button(bottomGap*5,bottomY,"buttonSheet",changeState,this,8,8,8);
 	button8.name = "discipline";
 	button8.anchor.set(0.5);	
-	
-	button9 = game.add.button(width*(5/6) ,height-buttonDispX,"buttonSheet",changeState,this,9,9,9);
+
+	button5 = game.add.button(bottomGap*6,bottomY,"buttonSheet",changeState,this,5,5,5);
+	button5.name = "save";
+	button5.anchor.set(0.5);
+
+	button9 = game.add.button(bottomGap*7,bottomY,"buttonSheet",changeState,this,9,9,9);
 	button9.name = "clock";
 	button9.anchor.set(0.5);	
 
-	retroButtons = [nameControl,button0,button1,button2,button3,button4,partnerControl,button6,button7,button8,button5,button9];
-	for(var i=0;i<retroButtons.length;i++){
-		retroButtons[i].scale.setTo(0.82);
-		retroButtons[i].alpha = 0.9;
+	var iconButtons = [button0,button1,button4,button2,button3,button6,button7,button8,button5,button9];
+	for(var i=0;i<iconButtons.length;i++){
+		iconButtons[i].scale.setTo(0.78);
+		iconButtons[i].alpha = 0.9;
 	}
+	retroButtons = [nameControl,button0,button1,button4,partnerControl,button2,button3,button6,button7,button8,button5,button9];
 	retroSelection = Math.min(retroSelection || 0, retroButtons.length-1);
 	updateRetroButtonSelection();
 	installRetroThreeButtonControls();
 
+}
+
+function createLcdTextButton(x,y,label,name){
+	var control = game.add.graphics(x,y);
+	control.beginFill(0xd8e2dd,0.96);
+	control.lineStyle(2,0x68766f,0.9);
+	control.drawRoundedRect(-50,-23,100,46,12);
+	control.endFill();
+	control.name = name;
+	control.inputEnabled = true;
+	control.events.onInputDown.add(function(){ changeState(control); });
+	var text = game.add.bitmapText(x,y,"pixel",label,16);
+	text.anchor.set(0.5);
+	text.inputEnabled = true;
+	text.events.onInputDown.add(function(){ changeState(control); });
+	control.labelText = text;
+	return control;
 }
 
 function changeState(button){
@@ -264,6 +276,9 @@ var retroControlsSuspended = false;
 function updateRetroButtonSelection(){
 	for(var i=0;i<retroButtons.length;i++){
 		retroButtons[i].tint = (i === retroSelection) ? 0xffff66 : 0xffffff;
+		if(retroButtons[i].labelText){
+			retroButtons[i].labelText.tint = (i === retroSelection) ? 0x4b4b10 : 0xffffff;
+		}
 	}
 }
 
