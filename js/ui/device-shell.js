@@ -142,8 +142,7 @@ function removeTempText(){
 
 
 function drawGameBody(){
-	// Modern LCD surface: keep the original button sprites/functionality, but
-	// remove the legacy bright-green frame artwork that made content feel cramped.
+	// Modern LCD surface with a single spacing system for both control rows.
 	game.stage.backgroundColor = "#aebeb6";
 	var lcd = game.add.graphics(0,0);
 	lcd.beginFill(0xaebeb6,1);
@@ -153,64 +152,37 @@ function drawGameBody(){
 	lcd.drawRoundedRect(72,142,width-144,height-284,24);
 	lcd.endFill();
 	
-	// Both rows share exactly the same left/right safe margin. The only
-	// difference is the number of equally-spaced slots in each row.
-	var controlMargin = 72;
-	var topXs = evenlySpacedControlXs(5, controlMargin);
-	var bottomXs = evenlySpacedControlXs(7, controlMargin);
-	var nameControl = createLcdTextButton(topXs[0], buttonDispX, "NAME", "name", 102);
+	// Both rows use the same 92px edge inset and 20px gap. The seven-button
+	// bottom row defines the compact button width; the remaining top-row space
+	// is deliberately given to NAME and PARTNER so those labels never squeeze.
+	var controlMargin = 92;
+	var controlGap = 20;
+	var compactWidth = (width - controlMargin*2 - controlGap*6) / 7;
+	var wideWidth = (width - controlMargin*2 - controlGap*4 - compactWidth*3) / 2;
+	var topWidths = [wideWidth,compactWidth,compactWidth,compactWidth,wideWidth];
+	var bottomWidths = [compactWidth,compactWidth,compactWidth,compactWidth,compactWidth,compactWidth,compactWidth];
+	var topXs = controlRowCenters(topWidths, controlMargin, controlGap);
+	var bottomXs = controlRowCenters(bottomWidths, controlMargin, controlGap);
+	var topY = 52;
+	var bottomY = height-topY;
 
-	button0 = game.add.button(topXs[1],buttonDispX,"buttonSheet",changeState,this,0,0,0);
-	button0.name = "stats";
-	button0.anchor.set(0.5);
-	
-	button1 = game.add.button(topXs[2],buttonDispX,"buttonSheet",changeState,this,2,2,2);
-	button1.name = "food";
-	button1.anchor.set(0.5);
-
-	button4 = game.add.button(topXs[3],buttonDispX,"buttonSheet",changeState,this,4,4,4);
-	button4.name = "speed";
-	button4.anchor.set(0.5);
-	var speedLabel = game.add.bitmapText(topXs[3],92,"pixel",getSpeedLabel(),18);
+	var nameControl = createLcdTextButton(topXs[0], topY, "NAME", "name", topWidths[0]);
+	button0 = createLcdTextButton(topXs[1], topY, "INFO", "stats", topWidths[1]);
+	button1 = createLcdTextButton(topXs[2], topY, "FOOD", "food", topWidths[2]);
+	button4 = createLcdTextButton(topXs[3], topY, "SPEED", "speed", topWidths[3]);
+	var speedLabel = game.add.bitmapText(topXs[3],90,"pixel",getSpeedLabel(),14);
 	speedLabel.anchor.set(0.5);
+	speedLabel.tint = 0x4d5d55;
+	var partnerControl = createLcdTextButton(topXs[4], topY, "PARTNER", "partner", topWidths[4]);
 
-	var partnerControl = createLcdTextButton(topXs[4], buttonDispX, "PARTNER", "partner", 102);
+	button2 = createLcdTextButton(bottomXs[0], bottomY, "CLEAN", "toilet", bottomWidths[0]);
+	button3 = createLcdTextButton(bottomXs[1], bottomY, "GAME", "play", bottomWidths[1]);
+	button6 = createLcdTextButton(bottomXs[2], bottomY, "MED", "medicine", bottomWidths[2]);
+	button7 = createLcdTextButton(bottomXs[3], bottomY, "LIGHT", "lights", bottomWidths[3]);
+	button8 = createLcdTextButton(bottomXs[4], bottomY, "DISC", "discipline", bottomWidths[4]);
+	button5 = createLcdTextButton(bottomXs[5], bottomY, "SAVE", "save", bottomWidths[5]);
+	button9 = createLcdTextButton(bottomXs[6], bottomY, "CLOCK", "clock", bottomWidths[6]);
 
-	var bottomY = height-buttonDispX;
-
-	button2 = game.add.button(bottomXs[0],bottomY,"buttonSheet",changeState,this,1,1,1);
-	button2.name = "toilet";
-	button2.anchor.set(0.5);
-
-	button3 = game.add.button(bottomXs[1],bottomY,"buttonSheet",changeState,this,3,3,3);
-	button3.name = "play";
-	button3.anchor.set(0.5);
-
-	button6 = game.add.button(bottomXs[2],bottomY,"buttonSheet",changeState,this,6,6,6);
-	button6.name = "medicine";
-	button6.anchor.set(0.5);
-
-	button7 = game.add.button(bottomXs[3],bottomY,"buttonSheet",changeState,this,7,7,7);
-	button7.name = "lights";
-	button7.anchor.set(0.5);	
-	
-	button8 = game.add.button(bottomXs[4],bottomY,"buttonSheet",changeState,this,8,8,8);
-	button8.name = "discipline";
-	button8.anchor.set(0.5);	
-
-	button5 = game.add.button(bottomXs[5],bottomY,"buttonSheet",changeState,this,5,5,5);
-	button5.name = "save";
-	button5.anchor.set(0.5);
-
-	button9 = game.add.button(bottomXs[6],bottomY,"buttonSheet",changeState,this,9,9,9);
-	button9.name = "clock";
-	button9.anchor.set(0.5);	
-
-	var iconButtons = [button0,button1,button4,button2,button3,button6,button7,button8,button5,button9];
-	for(var i=0;i<iconButtons.length;i++){
-		iconButtons[i].scale.setTo(0.78);
-		iconButtons[i].alpha = 0.9;
-	}
 	retroButtons = [nameControl,button0,button1,button4,partnerControl,button2,button3,button6,button7,button8,button5,button9];
 	retroSelection = Math.min(retroSelection || 0, retroButtons.length-1);
 	updateRetroButtonSelection();
@@ -218,27 +190,40 @@ function drawGameBody(){
 
 }
 
-function evenlySpacedControlXs(count, margin){
+function controlRowCenters(widths, margin, gap){
 	var result = [];
-	var usableWidth = width - (margin * 2);
-	var gap = count > 1 ? usableWidth / (count - 1) : 0;
-	for(var i=0;i<count;i++) result.push(margin + gap*i);
+	var cursor = margin;
+	for(var i=0;i<widths.length;i++){
+		result.push(cursor + widths[i]/2);
+		cursor += widths[i] + gap;
+	}
 	return result;
 }
 
 function createLcdTextButton(x,y,label,name,buttonWidth){
-	buttonWidth = buttonWidth || 102;
+	buttonWidth = buttonWidth || 72;
+	var buttonHeight = 48;
 	var control = game.add.graphics(x,y);
-	control.beginFill(0xd8e2dd,0.96);
-	control.lineStyle(2,0x68766f,0.9);
-	control.drawRoundedRect(-buttonWidth/2,-23,buttonWidth,46,12);
-	control.endFill();
 	control.name = name;
+	control.buttonWidth = buttonWidth;
+	control.buttonHeight = buttonHeight;
+	control.isLcdControl = true;
+	control.redraw = function(selected){
+		control.clear();
+		control.beginFill(selected ? 0xece7b7 : 0xd8e2dd, selected ? 1 : 0.94);
+		control.lineStyle(selected ? 2 : 1, selected ? 0x43554c : 0x65766e, 0.95);
+		control.drawRoundedRect(-buttonWidth/2,-buttonHeight/2,buttonWidth,buttonHeight,11);
+		control.endFill();
+		control.lineStyle(1,0xffffff,0.42);
+		control.moveTo(-buttonWidth/2+10,-buttonHeight/2+7);
+		control.lineTo(buttonWidth/2-10,-buttonHeight/2+7);
+	};
+	control.redraw(false);
 	control.inputEnabled = true;
 	control.events.onInputDown.add(function(){ changeState(control); });
-	var text = game.add.bitmapText(x,y,"pixel",label,16);
+	var text = game.add.bitmapText(x,y,"pixel",label,14);
 	text.anchor.set(0.5);
-	var maxTextWidth = buttonWidth - 16;
+	var maxTextWidth = buttonWidth - 18;
 	if(text.width > maxTextWidth){
 		var fitScale = maxTextWidth / text.width;
 		text.scale.setTo(fitScale);
@@ -290,9 +275,11 @@ var retroControlsSuspended = false;
 
 function updateRetroButtonSelection(){
 	for(var i=0;i<retroButtons.length;i++){
-		retroButtons[i].tint = (i === retroSelection) ? 0xffff66 : 0xffffff;
+		var selected = i === retroSelection;
+		if(retroButtons[i].isLcdControl && retroButtons[i].redraw) retroButtons[i].redraw(selected);
+		else retroButtons[i].tint = selected ? 0xffff66 : 0xffffff;
 		if(retroButtons[i].labelText){
-			retroButtons[i].labelText.tint = (i === retroSelection) ? 0x4b4b10 : 0xffffff;
+			retroButtons[i].labelText.tint = selected ? 0x27352f : 0x3d4b45;
 		}
 	}
 }
