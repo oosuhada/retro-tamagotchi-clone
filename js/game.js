@@ -5,6 +5,10 @@ var height = 800;
 var width = 800;
 var buttonDispX = 50;
 
+function weightInGrams(weightOz){
+	return Math.round((Number(weightOz) || 0) * 28.3495);
+}
+
 date = new Date();
 
 
@@ -97,7 +101,7 @@ var main = {
 		var now = new Date();
 		clockText.text = padClock(now.getHours()) + ":" + padClock(now.getMinutes());
 		var partner = DigimonPartners.get(pet.partnerId);
-		stageText.text = (pet.name || partner.name).toUpperCase() + "  " + pet.lifeStage.toUpperCase() + "  " + pet.weight + "oz";
+		stageText.text = (pet.name || partner.name).toUpperCase() + "  " + pet.lifeStage.toUpperCase() + "  " + weightInGrams(pet.weight) + "g";
 		sleepText.text = pet.sleeping ? (pet.lightsOn ? "SLEEPING - LIGHT ON" : "Z Z Z") : "";
 		attentionText.text = pet.attention && pet.attention.active ? "! ATTENTION: " + pet.attention.reason.toUpperCase() : "";
 		deathText.text = pet.dead ? "DEAD: " + pet.deathReason + "  A+C NEW EGG" : "";
@@ -207,7 +211,7 @@ var stats = {
 			"\nPARTNER  " + (partner ? partner.name : "-") +
 			"\nSTAGE  " + pet.lifeStage.toUpperCase() +
 			"\nAGE  " + pet.age + " DAY" +
-			"\nWEIGHT  " + pet.weight + " oz" +
+			"\nWEIGHT  " + weightInGrams(pet.weight) + " g" +
 			"\nHUNGRY  " + P1DeviceEngine.hearts(pet.hunger) +
 			"\nHAPPY  " + P1DeviceEngine.hearts(pet.happiness) +
 			"\nDISCIPLINE  " + pet.discipline + "%" +
