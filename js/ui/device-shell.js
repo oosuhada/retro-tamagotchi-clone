@@ -152,10 +152,10 @@ function drawGameBody(){
 	lcd.drawRoundedRect(72,142,width-144,height-284,24);
 	lcd.endFill();
 	
-	// Both rows use the same 92px edge inset and 20px gap. The seven-button
+	// Both rows use the same generous edge inset and 20px gap. The seven-button
 	// bottom row defines the compact button width; the remaining top-row space
 	// is deliberately given to NAME and PARTNER so those labels never squeeze.
-	var controlMargin = 92;
+	var controlMargin = 112;
 	var controlGap = 20;
 	var compactWidth = (width - controlMargin*2 - controlGap*6) / 7;
 	var wideWidth = (width - controlMargin*2 - controlGap*4 - compactWidth*3) / 2;
@@ -210,7 +210,9 @@ function createLcdTextButton(x,y,label,name,buttonWidth){
 	control.isLcdControl = true;
 	control.redraw = function(selected){
 		control.clear();
-		control.beginFill(selected ? 0xece7b7 : 0xd8e2dd, selected ? 1 : 0.94);
+		// Keep every control on the same neutral LCD surface. Selection is shown
+		// only by the border so NAME never turns yellow while PARTNER stays gray.
+		control.beginFill(0xd8e2dd,0.94);
 		control.lineStyle(selected ? 2 : 1, selected ? 0x43554c : 0x65766e, 0.95);
 		control.drawRoundedRect(-buttonWidth/2,-buttonHeight/2,buttonWidth,buttonHeight,11);
 		control.endFill();
@@ -279,7 +281,7 @@ function updateRetroButtonSelection(){
 		if(retroButtons[i].isLcdControl && retroButtons[i].redraw) retroButtons[i].redraw(selected);
 		else retroButtons[i].tint = selected ? 0xffff66 : 0xffffff;
 		if(retroButtons[i].labelText){
-			retroButtons[i].labelText.tint = selected ? 0x27352f : 0x3d4b45;
+			retroButtons[i].labelText.tint = 0x3d4b45;
 		}
 	}
 }
