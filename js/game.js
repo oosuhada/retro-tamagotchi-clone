@@ -13,6 +13,27 @@ var tickCounter = 0 ;
 
 var time;
 
+function partnerColorValue(hex, fallback){
+	var parsed = parseInt(String(hex || "").replace("#",""),16);
+	return isNaN(parsed) ? fallback : parsed;
+}
+
+function drawPartnerEgg(graphic, partner){
+	graphic.clear();
+	graphic.beginFill(0xf5f5dc,1);
+	graphic.lineStyle(6,0x222222,1);
+	graphic.drawEllipse(-46,-58,92,116);
+	graphic.endFill();
+	graphic.lineStyle(0,0,0);
+	graphic.beginFill(partnerColorValue(partner && partner.accent,0xd2b46c),0.95);
+	graphic.drawCircle(-18,-16,22);
+	graphic.drawCircle(19,11,18);
+	graphic.endFill();
+	graphic.beginFill(partnerColorValue(partner && partner.dark,0x6b5b44),0.95);
+	graphic.drawCircle(2,34,12);
+	graphic.endFill();
+}
+
 
 //---------------------------STATES---------------------------------------
 var main = {
@@ -39,6 +60,7 @@ var main = {
 			DigimonPartners.applyToPet(pet,nextId);
 			partnerBitmap = DigimonPartners.createBitmap(game,nextId);
 			petSprite.loadTexture(partnerBitmap);
+			drawPartnerEgg(eggGraphic,DigimonPartners.get(nextId));
 		};
 		window.addEventListener("digimon-partner-change",partnerChangeHandler);
 		counter = game.add.bitmapText(75, game.world.centerY-200,"pixel","tickCounter",32);
@@ -53,10 +75,9 @@ var main = {
 		deathText = game.add.bitmapText(game.world.centerX, game.world.centerY+220,"pixel","",18);
 		deathText.anchor.set(0.5);
 		eggGraphic = game.add.graphics(game.world.centerX, game.world.centerY);
-		eggGraphic.beginFill(0xf5f5dc);
-		eggGraphic.lineStyle(6,0x222222,1);
-		eggGraphic.drawEllipse(-46,-58,92,116);
-		eggGraphic.endFill();
+		drawPartnerEgg(eggGraphic,DigimonPartners.get(selectedPartnerId));
+		eggGraphic.baseX = this.game.world.centerX;
+		eggGraphic.baseY = this.game.world.centerY;
 		petSprite.baseY = this.game.world.centerY;
 		//add Sprites for ailments - conditions that can afflict the pet.
 		sickSprite = game.add.sprite(petSprite.x+50,petSprite.y-50,"ailmentSheet");
@@ -102,18 +123,25 @@ var main = {
 		attentionText.text = pet.attention && pet.attention.active ? "! ATTENTION: " + pet.attention.reason.toUpperCase() : "";
 		deathText.text = pet.dead ? "DEAD: " + pet.deathReason + "  A+C NEW EGG" : "";
 
+		var speed = Math.max(1, Number(globalVal.speedMultiplier) || 1);
 		if(pet.lifeStage === "egg"){
 			petSprite.alpha = 0;
 			eggGraphic.alpha = 1;
+			var eggPhase = Date.now() / (340 / speed);
+			eggGraphic.x = eggGraphic.baseX + Math.sin(eggPhase) * 6;
+			eggGraphic.y = eggGraphic.baseY - Math.max(0,Math.sin(eggPhase * 0.7)) * 5;
+			eggGraphic.rotation = Math.sin(eggPhase) * 0.045;
 		}else{
 			petSprite.alpha = pet.sleeping && !pet.lightsOn ? 0.25 : 1;
 			eggGraphic.alpha = 0;
+			eggGraphic.x = eggGraphic.baseX;
+			eggGraphic.y = eggGraphic.baseY;
+			eggGraphic.rotation = 0;
 			if(pet.lifeStage === "baby") petSprite.scale.setTo(0.72);
 			else if(pet.lifeStage === "child") petSprite.scale.setTo(0.84);
 			else if(pet.lifeStage === "teen") petSprite.scale.setTo(0.94);
 			else petSprite.scale.setTo(1);
 		}
-		var speed = Math.max(1, Number(globalVal.speedMultiplier) || 1);
 		petSprite.y = petSprite.baseY + (Math.floor(Date.now()/(500/speed))%2 === 0 ? -3 : 3);
 		petSprite.tint = pet.dead ? 0x555555 : pet.sick ? 0x91b871 : 0xffffff;
         
@@ -203,7 +231,7 @@ var stats = {
 		tickCheck();
 		var profile = P1DeviceEngine.profile(pet);
 		var partner = typeof DigimonPartners !== "undefined" ? DigimonPartners.get(DigimonPartners.selectedId(pet)) : null;
-		text.text = "NAME  " + pet.name +
+		text.text = "NAME  " + (pet.nameCustomized && pet.name ? pet.name : "-") +
 			"\nPARTNER  " + (partner ? partner.name : "-") +
 			"\nSTAGE  " + pet.lifeStage.toUpperCase() +
 			"\nAGE  " + pet.age + " DAY" +

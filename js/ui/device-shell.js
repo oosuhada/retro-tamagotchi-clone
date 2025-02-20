@@ -166,7 +166,7 @@ function drawGameBody(){
 	var topY = 52;
 	var bottomY = height-topY;
 
-	var nameControl = createLcdTextButton(topXs[0], topY, "NAME", "name", topWidths[0]);
+	var nameControl = createLcdTextButton(topXs[0], topY, getNameControlLabel(), "name", topWidths[0]);
 	button0 = createLcdTextButton(topXs[1], topY, "INFO", "stats", topWidths[1]);
 	button1 = createLcdTextButton(topXs[2], topY, "FOOD", "food", topWidths[2]);
 	button4 = createLcdTextButton(topXs[3], topY, "SPEED", "speed", topWidths[3]);
@@ -184,6 +184,9 @@ function drawGameBody(){
 	button9 = createLcdTextButton(bottomXs[6], bottomY, "CLOCK", "clock", bottomWidths[6]);
 
 	retroButtons = [nameControl,button0,button1,button4,partnerControl,button2,button3,button6,button7,button8,button5,button9];
+	window.refreshTamagotchiNameControl = function(){
+		if(nameControl && nameControl.setLabel) nameControl.setLabel(getNameControlLabel());
+	};
 	retroSelection = Math.min(retroSelection || 0, retroButtons.length-1);
 	updateRetroButtonSelection();
 	installRetroThreeButtonControls();
@@ -226,14 +229,26 @@ function createLcdTextButton(x,y,label,name,buttonWidth){
 	var text = game.add.bitmapText(x,y,"pixel",label,14);
 	text.anchor.set(0.5);
 	var maxTextWidth = buttonWidth - 18;
-	if(text.width > maxTextWidth){
-		var fitScale = maxTextWidth / text.width;
-		text.scale.setTo(fitScale);
-	}
+	control.setLabel = function(nextLabel){
+		text.text = String(nextLabel || "").toUpperCase();
+		text.scale.setTo(1);
+		if(text.width > maxTextWidth){
+			var fitScale = maxTextWidth / text.width;
+			text.scale.setTo(fitScale);
+		}
+	};
+	control.setLabel(label);
 	text.inputEnabled = true;
 	text.events.onInputDown.add(function(){ changeState(control); });
 	control.labelText = text;
 	return control;
+}
+
+function getNameControlLabel(){
+	if(typeof pet !== "undefined" && pet && pet.nameCustomized && pet.name){
+		return String(pet.name).toUpperCase();
+	}
+	return "NAME";
 }
 
 function changeState(button){

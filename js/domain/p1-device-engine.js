@@ -339,12 +339,18 @@ var P1DeviceEngine = (function(){
 		return true;
 	}
 
-	function restart(pet){
+	function restart(pet, options){
+		options = options || {};
 		var now = Date.now();
-		var partnerId = typeof DigimonPartners !== "undefined" ? DigimonPartners.selectedId(pet) : pet.partnerId;
+		var requestedPartnerId = options.partnerId || null;
+		var partnerId = typeof DigimonPartners !== "undefined"
+			? (requestedPartnerId && DigimonPartners.all[requestedPartnerId] ? requestedPartnerId : DigimonPartners.selectedId(pet))
+			: (requestedPartnerId || pet.partnerId);
 		var partnerName = typeof DigimonPartners !== "undefined" ? DigimonPartners.get(partnerId).name : pet.partnerName;
+		var keepCustomName = !options.resetName && !!pet.nameCustomized && !!pet.name;
 		var fresh = {
-			name: pet.name || pet.partnerName || "PARTNER",
+			name: keepCustomName ? pet.name : "",
+			nameCustomized: keepCustomName,
 			sex: pet.sex || "M",
 			age: 0,
 			health: 50,
@@ -383,6 +389,11 @@ var P1DeviceEngine = (function(){
 		Object.assign(pet, fresh);
 	}
 
+	function receivePartnerEgg(pet, partnerId){
+		restart(pet, { partnerId:partnerId, resetName:true });
+		return pet;
+	}
+
 	function hearts(value){
 		var filled = Math.max(0, Math.min(4, Math.ceil(value / 25)));
 		return "♥".repeat(filled) + "·".repeat(4-filled);
@@ -401,6 +412,7 @@ var P1DeviceEngine = (function(){
 		gameDelay:gameDelay,
 		careAction:careAction,
 		restart:restart,
+		receivePartnerEgg:receivePartnerEgg,
 		hearts:hearts,
 		profile:profile,
 		recordSickness:recordSickness,

@@ -98,18 +98,33 @@
 				text-transform: uppercase;
 				box-shadow: inset 0 -2px rgba(0,0,0,.08);
 				cursor: pointer;
+				opacity: .55;
+				filter: grayscale(.5) saturate(.6);
+				transition: opacity .14s ease, filter .14s ease, transform .14s ease, background .14s ease;
 			}
-			.partner-card.selected { background: #e8efe4; outline: 2px solid #33423b; }
-			.partner-card::before {
-				content: "";
+			.partner-card:hover,
+			.partner-card:focus-visible,
+			.partner-card.selected {
+				opacity: 1;
+				filter: none;
+				background: #e8efe4;
+			}
+			.partner-card.selected { outline: 2px solid #33423b; }
+			.partner-card:active { transform: scale(.98); }
+			.partner-preview {
 				display: block;
-				width: 26px;
-				height: 26px;
-				margin: 4px auto 3px;
-				border-radius: 5px;
-				background: var(--partner-color);
-				box-shadow: inset -6px -6px var(--partner-dark), 0 0 0 2px #222;
+				width: clamp(48px, 8dvh, 68px);
+				height: clamp(48px, 8dvh, 68px);
+				margin: 2px auto 1px;
 				image-rendering: pixelated;
+			}
+			.partner-name { display: block; line-height: 1.15; }
+			.partner-action {
+				display: block;
+				margin-top: 2px;
+				font-size: .78em;
+				letter-spacing: .05em;
+				opacity: .65;
 			}
 			#partner-select .select-help {
 				grid-column: 1 / -1;
@@ -246,33 +261,33 @@
 		</style>
 		<script src="js/phaser.js?v=20260826-2"></script>
 		<script src="js/domain/p1-character-profiles.js?v=20260826-2"></script>
-		<script src="js/domain/digimon-partners.js?v=20260826-7"></script>
-		<script src="js/domain/p1-device-engine.js?v=20260826-6"></script>
-		<script src="js/ui/device-shell.js?v=20260826-13"></script>
+		<script src="js/domain/digimon-partners.js?v=20260826-8"></script>
+		<script src="js/domain/p1-device-engine.js?v=20260826-7"></script>
+		<script src="js/ui/device-shell.js?v=20260826-14"></script>
 		<script src="js/care/feeding-screen.js?v=20260826-2"></script>
 		<script src="js/care/left-right-game.js?v=20260826-2"></script>
 		<script src="js/shop.js?v=20260826-2"></script>
-		<script src="js/system/save-storage.js?v=20260826-6"></script>
+		<script src="js/system/save-storage.js?v=20260826-7"></script>
 		<script src="js/settings.js?v=20260826-2"></script>
-		<script src="js/game.js?v=20260826-8"></script>
+		<script src="js/game.js?v=20260826-9"></script>
   </head>
   <body>
 	<div id="tamagotchi-console">
 		<div id="screen-bezel"><div id="tamagotchi-screen">
 			<div id="partner-select" class="hidden" aria-label="Choose Digimon partner">
 				<div class="select-title">CHOOSE PARTNER</div>
-				<button class="partner-card" type="button" data-partner="agumon" style="--partner-color:#e98a2f;--partner-dark:#743411">AGUMON</button>
-				<button class="partner-card" type="button" data-partner="gabumon" style="--partner-color:#d8c08c;--partner-dark:#44578e">GABUMON</button>
-				<button class="partner-card" type="button" data-partner="patamon" style="--partner-color:#d99b57;--partner-dark:#7c4a27">PATAMON</button>
-				<button class="partner-card" type="button" data-partner="tentomon" style="--partner-color:#b83b35;--partner-dark:#28304e">TENTOMON</button>
-				<div class="select-help">A PREV · B OK · C NEXT</div>
+				<button class="partner-card" type="button" data-partner="agumon"><canvas class="partner-preview" aria-hidden="true"></canvas><span class="partner-name">AGUMON</span><span class="partner-action">GET EGG</span></button>
+				<button class="partner-card" type="button" data-partner="gabumon"><canvas class="partner-preview" aria-hidden="true"></canvas><span class="partner-name">GABUMON</span><span class="partner-action">GET EGG</span></button>
+				<button class="partner-card" type="button" data-partner="patamon"><canvas class="partner-preview" aria-hidden="true"></canvas><span class="partner-name">PATAMON</span><span class="partner-action">GET EGG</span></button>
+				<button class="partner-card" type="button" data-partner="tentomon"><canvas class="partner-preview" aria-hidden="true"></canvas><span class="partner-name">TENTOMON</span><span class="partner-action">GET EGG</span></button>
+				<div class="select-help">A PREV · B GET EGG · C NEXT</div>
 			</div>
 			<div id="name-editor" class="hidden" aria-label="Set partner name">
 				<div>SET NAME</div>
 				<input id="partner-name-input" maxlength="10" autocomplete="off" />
 				<div class="name-actions">
 					<button id="name-save" type="button">SAVE</button>
-					<button id="name-cancel" type="button">CANCEL</button>
+					<button id="name-cancel" type="button">BACK</button>
 				</div>
 			</div>
 		</div></div>
@@ -300,6 +315,12 @@
 			var nameInput = document.getElementById('partner-name-input');
 			var cards = Array.prototype.slice.call(document.querySelectorAll('.partner-card'));
 			var selectedIndex = 0;
+			cards.forEach(function(card){
+				var preview = card.querySelector('.partner-preview');
+				if(window.DigimonPartners && DigimonPartners.renderPreview){
+					DigimonPartners.renderPreview(preview,card.getAttribute('data-partner'));
+				}
+			});
 			function currentStoredPartner(){ try { return localStorage.getItem('retro-digimon-partner'); } catch (_) { return null; } }
 			function syncSelection(id){
 				var found = cards.findIndex(function(card){ return card.getAttribute('data-partner') === id; });
@@ -310,38 +331,58 @@
 			function choosePartner(id){
 				try { localStorage.setItem('retro-digimon-partner', id); } catch (_) {}
 				if(window.pet && window.DigimonPartners){
-					var oldDefault = !window.pet.name || window.pet.name === 'BBQ MAN' || window.pet.name === window.pet.partnerName;
-					DigimonPartners.applyToPet(window.pet,id);
-					if(oldDefault) window.pet.name = window.pet.partnerName;
+					if(window.P1DeviceEngine && P1DeviceEngine.receivePartnerEgg){
+						P1DeviceEngine.receivePartnerEgg(window.pet,id);
+					}else{
+						DigimonPartners.applyToPet(window.pet,id);
+						window.pet.name = '';
+						window.pet.nameCustomized = false;
+					}
 					if(typeof saveStorage === 'function') saveStorage();
 				}
 				selector.classList.add('hidden');
-				window.dispatchEvent(new CustomEvent('digimon-partner-change',{detail:{id:id}}));
-				if(!window.pet || !window.pet.name) showNameEditor();
+				if(typeof window.refreshTamagotchiNameControl === 'function') window.refreshTamagotchiNameControl();
+				window.dispatchEvent(new CustomEvent('digimon-partner-change',{detail:{id:id,newEgg:true}}));
 			}
 			cards.forEach(function(card,index){ card.addEventListener('click', function(){ selectedIndex=index; syncSelection(card.getAttribute('data-partner')); choosePartner(card.getAttribute('data-partner')); }); });
 			window.showDigimonPartnerSelector = showSelector;
 			function showNameEditor(){
 				var fallback = window.pet && window.pet.partnerName ? window.pet.partnerName : 'PARTNER';
-				nameInput.value = (window.pet && window.pet.name && window.pet.name !== 'BBQ MAN') ? window.pet.name : fallback;
+				nameInput.value = (window.pet && window.pet.nameCustomized && window.pet.name) ? window.pet.name : fallback;
 				nameEditor.classList.remove('hidden');
 				setTimeout(function(){ nameInput.focus(); nameInput.select(); },0);
 			}
 			function saveName(){
 				var fallback = window.pet && window.pet.partnerName ? window.pet.partnerName : 'PARTNER';
 				var value = nameInput.value.trim().replace(/\s+/g,' ').slice(0,10).toUpperCase() || fallback;
-				if(window.pet){ window.pet.name = value; if(typeof saveStorage === 'function') saveStorage(); }
+				if(window.pet){
+					window.pet.name = value;
+					window.pet.nameCustomized = true;
+					if(typeof saveStorage === 'function') saveStorage();
+				}
 				nameEditor.classList.add('hidden');
+				if(typeof window.refreshTamagotchiNameControl === 'function') window.refreshTamagotchiNameControl();
 			}
+			function closeNameEditor(){ nameEditor.classList.add('hidden'); }
 			window.showDigimonNameEditor = showNameEditor;
 			document.getElementById('name-save').addEventListener('click', saveName);
-			document.getElementById('name-cancel').addEventListener('click', function(){ nameEditor.classList.add('hidden'); });
+			document.getElementById('name-cancel').addEventListener('click', closeNameEditor);
 			nameInput.addEventListener('keydown', function(event){
 				if(event.key === 'Enter'){ event.preventDefault(); saveName(); }
-				if(event.key === 'Escape'){ event.preventDefault(); nameEditor.classList.add('hidden'); }
+				if(event.key === 'Escape'){ event.preventDefault(); closeNameEditor(); }
 			});
 			if(!currentStoredPartner()) showSelector(); else syncSelection(currentStoredPartner());
 			window.addEventListener('keydown', function(event){
+				if(!nameEditor.classList.contains('hidden')){
+					// The on-screen C button dispatches a synthetic key without `key` text;
+					// keep physical C available for typing names while still making C = BACK.
+					if(event.key === 'Escape' || (event.keyCode === 67 && !event.key)){
+						closeNameEditor();
+						event.preventDefault();
+						event.stopImmediatePropagation();
+					}
+					return;
+				}
 				if(selector.classList.contains('hidden')) return;
 				if(event.keyCode === 65){ selectedIndex=(selectedIndex-1+cards.length)%cards.length; syncSelection(cards[selectedIndex].getAttribute('data-partner')); event.stopImmediatePropagation(); }
 				if(event.keyCode === 67){ selectedIndex=(selectedIndex+1)%cards.length; syncSelection(cards[selectedIndex].getAttribute('data-partner')); event.stopImmediatePropagation(); }

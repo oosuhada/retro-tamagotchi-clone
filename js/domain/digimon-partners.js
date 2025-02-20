@@ -122,5 +122,25 @@ var DigimonPartners = (function(){
 		return bitmap;
 	}
 
-	return { all:partners, get:get, selectedId:selectedId, applyToPet:applyToPet, createBitmap:createBitmap };
+	function renderPreview(canvas,id){
+		if(!canvas || !canvas.getContext) return;
+		var partner = get(id);
+		var ctx = canvas.getContext("2d");
+		var size = 64;
+		var pixel = 4;
+		canvas.width = size;
+		canvas.height = size;
+		ctx.clearRect(0,0,size,size);
+		ctx.imageSmoothingEnabled = false;
+		partner.pixels.forEach(function(row,y){
+			for(var x=0;x<row.length;x++){
+				var code = row.charAt(x);
+				if(code === ".") continue;
+				ctx.fillStyle = code === "O" ? "#f4e8b6" : code === "D" ? partner.dark : partner.accent;
+				ctx.fillRect(x*pixel,y*pixel,pixel,pixel);
+			}
+		});
+	}
+
+	return { all:partners, get:get, selectedId:selectedId, applyToPet:applyToPet, createBitmap:createBitmap, renderPreview:renderPreview };
 })();

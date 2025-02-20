@@ -1,5 +1,6 @@
 var pet = {
 	name : "",
+	nameCustomized : false,
 	sex : "M",
 	age : 0,
 	health : 50,
@@ -72,9 +73,11 @@ function loadJSON(key){
 function loadStorage(){
 	//loaded object is string (only strings can be stored), so we take the string
 	//and "parse" it back into an object.
+	var loadedHadNameCustomized = false;
     if(loadJSON("petSave")){
         var loadedPet = loadJSON("petSave");
         var loadedGlobal = loadJSON("globalValSave");
+		loadedHadNameCustomized = !!loadedPet && Object.prototype.hasOwnProperty.call(loadedPet,"nameCustomized");
         pet = Object.assign(JSON.parse(defaultPetJSON), loadedPet || {});
         globalVal = Object.assign(JSON.parse(defaultGlobalValJSON), loadedGlobal || {});
 		
@@ -82,7 +85,16 @@ function loadStorage(){
     }
 	if(typeof DigimonPartners !== "undefined"){
 		DigimonPartners.applyToPet(pet, DigimonPartners.selectedId(pet));
-		if(!pet.name || pet.name === "BBQ MAN") pet.name = pet.partnerName || "PARTNER";
+		// Older saves automatically copied the partner species into `name`.
+		// Treat that generated value as unnamed so NAME stays visible until the
+		// player explicitly saves a name in the editor.
+		if(!loadedHadNameCustomized){
+			pet.nameCustomized = !!pet.name && pet.name !== "BBQ MAN" && pet.name !== pet.partnerName;
+		}
+		if(!pet.nameCustomized || pet.name === "BBQ MAN"){
+			pet.name = "";
+			pet.nameCustomized = false;
+		}
 	}
 }
 
